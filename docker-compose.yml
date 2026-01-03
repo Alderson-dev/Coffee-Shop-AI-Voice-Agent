@@ -1,0 +1,68 @@
+services:
+  # Main Coffee Agent Application
+  coffee-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coffee-agent
+    image: coffee-agent:latest
+    ports:
+      - "3000:3000" # Expose directly on port 3000
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env # Load all environment variables from .env file
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - coffee-agent-network
+
+  # Caddy Reverse Proxy (Optional - provides HTTPS)
+  # Comment out this service if you don't need HTTPS locally
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    container_name: coffee-agent-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80" # HTTP (redirects to HTTPS)
+      - "443:443" # HTTPS
+      - "443:443/udp" # HTTP/3 support
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - coffee-agent-network
+    depends_on:
+      - coffee-agent
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  coffee-agent-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
