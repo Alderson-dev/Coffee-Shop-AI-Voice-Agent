@@ -3,8 +3,7 @@
 A Next.js application demonstrating Agora's Conversational AI Engine with real-time voice communication. This interactive coffee shop assistant showcases how to build voice-enabled AI agents using Agora RTC, OpenAI, and modern web technologies.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
+[![Docker Build and Test](https://github.com/Alderson-dev/Coffee-Shop-AI-Voice-Agent/actions/workflows/docker-build.yml/badge.svg)](https://github.com/Alderson-dev/Coffee-Shop-AI-Voice-Agent/actions/workflows/docker-build.yml)
 
 ## ✨ Features
 
