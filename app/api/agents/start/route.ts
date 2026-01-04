@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RtcTokenBuilder, RtcRole } from "agora-token";
 
+// Feature flag: Switch between 'groq' and 'openai'
+const LLM_PROVIDER = (process.env.LLM_PROVIDER || "groq") as "groq" | "openai";
+
 function generateBasicAuth(customerId: string, customerSecret: string): string {
   const credentials = `${customerId}:${customerSecret}`;
   return Buffer.from(credentials).toString("base64");
@@ -97,24 +100,44 @@ export async function POST(request: NextRequest) {
         asr: {
           language: "en-US",
         },
-        llm: {
-          url: "https://api.groq.com/openai/v1/chat/completions",
-          api_key: process.env.GROQ_API_KEY || "",
-          system_messages: [
-            {
-              role: "system",
-              content:
-                "You are a helpful coffee shop order taking assistant. Be friendly and concise, please take orders for coffee and tea and confirm each item after the user has finished speaking.",
-            },
-          ],
-          max_history: 32,
-          greeting_message:
-            "Hello! Welcome to HighBrew Coffee Shop. How can I help you today?",
-          failure_message: "Please hold on a second.",
-          params: {
-            model: "openai/gpt-oss-20b",
-          },
-        },
+        llm:
+          LLM_PROVIDER === "groq"
+            ? {
+                url: "https://api.groq.com/openai/v1/chat/completions",
+                api_key: process.env.GROQ_API_KEY || "",
+                system_messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are a helpful coffee shop order taking assistant. Be friendly and concise, please take orders for coffee and tea and confirm each item after the user has finished speaking.",
+                  },
+                ],
+                max_history: 32,
+                greeting_message:
+                  "Hello! Welcome to HighBrew Coffee Shop. How can I help you today?",
+                failure_message: "Please hold on a second.",
+                params: {
+                  model: "openai/gpt-oss-20b",
+                },
+              }
+            : {
+                url: "https://api.openai.com/v1/chat/completions",
+                api_key: process.env.OPENAI_API_KEY || "",
+                system_messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are a helpful coffee shop order taking assistant. Be friendly and concise, please take orders for coffee and tea and confirm each item after the user has finished speaking.",
+                  },
+                ],
+                max_history: 32,
+                greeting_message:
+                  "Hello! Welcome to HighBrew Coffee Shop. How can I help you today?",
+                failure_message: "Please hold on a second.",
+                params: {
+                  model: "gpt-4o-mini",
+                },
+              },
         tts: {
           vendor: "openai",
           params: {
@@ -127,6 +150,7 @@ export async function POST(request: NextRequest) {
 
     // Log the request for debugging
     console.log("=== Agora API Request ===");
+    console.log("🤖 LLM Provider:", LLM_PROVIDER.toUpperCase());
     console.log("URL:", agoraApiUrl);
     console.log("Agent Name:", agentName);
     console.log("Full Config:", JSON.stringify(agentConfig, null, 2));

@@ -1,6 +1,6 @@
-# Coffee Agent - Agora Conversational AI Demo
+# Coffee Agent - Agora Conversational AI with Groq
 
-A Next.js application demonstrating Agora's Conversational AI Engine with real-time voice communication. This interactive coffee shop assistant showcases how to build voice-enabled AI agents using Agora RTC, OpenAI, and modern web technologies.
+A Next.js application demonstrating Agora's Conversational AI Engine with real-time voice communication powered by **Groq's ultra-fast LLM inference**. This interactive coffee shop assistant showcases how to build voice-enabled AI agents using Agora RTC, Groq LLMs, and modern web technologies.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker Build and Test](https://github.com/Alderson-dev/Coffee-Shop-AI-Voice-Agent/actions/workflows/docker-build.yml/badge.svg)](https://github.com/Alderson-dev/Coffee-Shop-AI-Voice-Agent/actions/workflows/docker-build.yml)
@@ -8,7 +8,8 @@ A Next.js application demonstrating Agora's Conversational AI Engine with real-t
 ## ✨ Features
 
 - 🎙️ **Real-time Voice Communication** - Low-latency audio streaming with Agora RTC SDK
-- 🤖 **AI-Powered Assistant** - Intelligent conversations powered by OpenAI GPT-4
+- ⚡ **Powered by Groq** - Ultra-fast LLM inference with Llama 3.3 70B (default) or OpenAI GPT-4
+- 🤖 **AI-Powered Assistant** - Intelligent conversations with sub-second response times
 - 🎯 **Simple REST API** - Easy-to-use endpoints for agent management
 - 🐳 **Container Ready** - Full Docker and Podman support with docker-compose
 - 🔒 **Secure by Default** - Environment-based configuration, no hardcoded secrets
@@ -38,8 +39,9 @@ A Next.js application demonstrating Agora's Conversational AI Engine with real-t
          │
          ↓
 ┌─────────────────┐
-│  OpenAI GPT-4   │
-│   + TTS         │
+│  Groq LLM API   │
+│ (Llama 3.3 70B) │
+│  + OpenAI TTS   │
 └─────────────────┘
 ```
 
@@ -48,7 +50,8 @@ A Next.js application demonstrating Agora's Conversational AI Engine with real-t
 **Required:**
 - Docker/Podman (recommended) OR Node.js 20+
 - [Agora Account](https://console.agora.io/) (free tier available)
-- [OpenAI API Key](https://platform.openai.com/api-keys)
+- [Groq API Key](https://console.groq.com/) (free tier available - **recommended for best performance**)
+- [OpenAI API Key](https://platform.openai.com/api-keys) (required for TTS, optional for LLM)
 
 **Optional:**
 - Make (for convenient commands)
@@ -123,7 +126,15 @@ npm start
 - Enable "App Certificate" under project settings
 - Note down: App ID, App Certificate, Customer ID, Customer Secret
 
+**Groq API Key** ([Get it here](https://console.groq.com/)) - **Recommended**:
+- Create a free account at Groq
+- Generate a new API key
+- Note down the key (starts with `gsk_`)
+- ⚡ **Why Groq?** Ultra-fast inference (~200-500ms response time vs 800-2000ms)
+
 **OpenAI API Key** ([Get it here](https://platform.openai.com/api-keys)):
+- Required for Text-to-Speech (TTS)
+- Optional for LLM (if you want to use GPT instead of Groq)
 - Create an account at OpenAI
 - Generate a new API key
 - Note down the key (starts with `sk-`)
@@ -133,13 +144,19 @@ npm start
 Edit your `.env` file:
 
 ```env
+# LLM Provider Selection
+LLM_PROVIDER=groq  # Use 'groq' (recommended) or 'openai'
+
 # Agora Configuration
 AGORA_APP_ID=your_agora_app_id_here
 AGORA_APP_CERTIFICATE=your_agora_app_certificate_here
 AGORA_CUSTOMER_ID=your_customer_id_here
 AGORA_CUSTOMER_SECRET=your_customer_secret_here
 
-# OpenAI Configuration
+# Groq Configuration (Recommended - Ultra-fast inference)
+GROQ_API_KEY=your_groq_api_key_here
+
+# OpenAI Configuration (Required for TTS, Optional for LLM)
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
@@ -301,13 +318,31 @@ docker rm coffee-agent
 The AI agent is configured in `/app/api/agents/start/route.ts` with:
 
 - **ASR (Speech Recognition)**: Agora ARES (English)
-- **LLM**: OpenAI GPT-4o-mini
+- **LLM**: Groq Llama 3.3 70B (default) or OpenAI GPT-4o-mini
 - **TTS (Text-to-Speech)**: OpenAI TTS with Alloy voice
 - **Idle Timeout**: 120 seconds
 - **System Prompt**: Coffee shop order-taking assistant
 - **Max History**: 32 messages
 
 You can customize the agent behavior by modifying the `agentConfig` object in the start endpoint.
+
+#### Switching LLM Providers
+
+Set `LLM_PROVIDER` in your `.env` file:
+
+```bash
+# Use Groq (recommended for lowest latency)
+LLM_PROVIDER=groq
+
+# Use OpenAI (alternative)
+LLM_PROVIDER=openai
+```
+
+**Performance Comparison:**
+- **Groq (Llama 3.3 70B)**: ~200-500ms first response time ⚡
+- **OpenAI (GPT-4o-mini)**: ~800-2000ms first response time
+
+See `LLM_TESTING.md` for detailed latency testing guide.
 
 ### Port Configuration
 
@@ -569,6 +604,8 @@ Add health monitoring with tools like:
 ### Official Documentation
 - [Agora Conversational AI Documentation](https://docs.agora.io/en/conversational-ai/)
 - [Agora RTC SDK Documentation](https://docs.agora.io/en/video-calling/)
+- [Groq API Documentation](https://console.groq.com/docs)
+- [Groq Models Overview](https://console.groq.com/docs/models)
 - [OpenAI API Documentation](https://platform.openai.com/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Docker Documentation](https://docs.docker.com/)
@@ -577,6 +614,7 @@ Add health monitoring with tools like:
 ### Support
 - **Agora Support**: https://www.agora.io/en/support/
 - **Agora Community**: https://www.agora.io/en/community/
+- **Groq Discord**: https://groq.com/discord
 - **GitHub Issues**: [Create an issue](../../issues)
 - **OpenAI Community**: https://community.openai.com/
 
@@ -605,11 +643,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🙏 Acknowledgments
 
 - [Agora.io](https://www.agora.io/) for the Conversational AI Engine
-- [OpenAI](https://openai.com/) for GPT and TTS capabilities
+- [Groq](https://groq.com/) for ultra-fast LLM inference
+- [OpenAI](https://openai.com/) for TTS capabilities
+- [Meta](https://www.meta.com/) for the Llama 3.3 model
 - [Vercel](https://vercel.com/) for Next.js framework
 
 ---
 
-**Built with ❤️ using Agora Conversational AI, OpenAI, and Next.js**
+**Built with ❤️ using Agora Conversational AI, Groq, and Next.js**
 
 For questions or support, please [open an issue](../../issues) or contact the maintainers.
