@@ -8,7 +8,7 @@ A Next.js application demonstrating Agora's Conversational AI Engine with real-t
 ## ✨ Features
 
 - 🎙️ **Real-time Voice Communication** - Low-latency audio streaming with Agora RTC SDK
-- ⚡ **Powered by Groq** - Ultra-fast LLM inference with Llama 3.3 70B (default) or OpenAI GPT-4
+- ⚡ **Powered by Groq** - Ultra-fast LLM inference with gpt-oss-20b (default) or OpenAI GPT-4
 - 🤖 **AI-Powered Assistant** - Intelligent conversations with sub-second response times
 - 🎯 **Simple REST API** - Easy-to-use endpoints for agent management
 - 🐳 **Container Ready** - Full Docker and Podman support with docker-compose
@@ -40,7 +40,7 @@ A Next.js application demonstrating Agora's Conversational AI Engine with real-t
          ↓
 ┌─────────────────┐
 │  Groq LLM API   │
-│ (Llama 3.3 70B) │
+│ (gpt-oss-20b) │
 │  + OpenAI TTS   │
 └─────────────────┘
 ```
